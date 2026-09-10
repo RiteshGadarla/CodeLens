@@ -147,6 +147,92 @@ public class GraphStore {
                 projectId);
     }
 
+    // ---- incremental
+
+    public record StoredFile(long id, String path, String sha256) {
+    }
+
+    public Map<String, StoredFile> loadFiles(long projectId) {
+        var map = new HashMap<String, StoredFile>();
+        jdbc.query("select id, path, sha256 from source_file where project_id = ?", rs -> {
+            map.put(rs.getString(2), new StoredFile(rs.getLong(1), rs.getString(2), rs.getString(3)));
+        }, projectId);
+        return map;
+    }
+
+    public Map<String, Long> loadEntityIds(long projectId) {
+        var map = new HashMap<String, Long>();
+        jdbc.query("select id, qualified_name from code_entity where project_id = ?", rs -> {
+            map.put(rs.getString(2), rs.getLong(1));
+        }, projectId);
+        return map;
+    }
+
+    // files holding edges into entities of the given files
+    public Set<String> dependentFilePaths(long projectId, Collection<Long> fileIds) {
+        if (fileIds.isEmpty()) return Set.of();
+        return new HashSet<>(jdbc.queryForList("""
+                select distinct sf.path
+                from dependency_edge d
+                join code_entity t on t.id = d.target_id
+                join source_file sf on sf.id = d.file_id
+                where d.project_id = ? and t.file_id = any(?)""", String.class, projectId, ids(fileIds)));
+    }
+
+    public void deleteEntitiesOfFiles(long projectId, Collection<Long> fileIds) {
+        if (fileIds.isEmpty()) return;
+        Long[] ids = ids(fileIds);
+        jdbc.update("""
+                delete from dependency_edge d using code_entity e
+                where d.project_id = ? and e.file_id = any(?) and (d.source_id = e.id or d.target_id = e.id)""",
+                projectId, ids);
+        jdbc.update("delete from entity_metric m using code_entity e where m.entity_id = e.id and e.file_id = any(?)",
+                (Object) ids);
+        jdbc.update("delete from code_entity where project_id = ? and file_id = any(?)", projectId, ids);
+    }
+
+    public void deleteEdgesOfFiles(long projectId, Collection<Long> fileIds) {
+        if (fileIds.isEmpty()) return;
+        jdbc.update("delete from dependency_edge where project_id = ? and file_id = any(?)", projectId, ids(fileIds));
+    }
+
+    public void deleteFiles(long projectId, Collection<Long> fileIds) {
+        if (fileIds.isEmpty()) return;
+        deleteEntitiesOfFiles(projectId, fileIds);
+        jdbc.update("delete from source_file where project_id = ? and id = any(?)", projectId, ids(fileIds));
+    }
+
+    public void updateFiles(long projectId, Collection<FileRow> rows) {
+        var args = rows.stream()
+                .map(f -> new Object[]{f.module(), f.packageName(), f.sha256(), f.loc(), f.test(), f.parseError(),
+                        projectId, f.path()})
+                .toList();
+        batch("""
+                update source_file set module = ?, package_name = ?, sha256 = ?, loc = ?, test = ?, parse_error = ?
+                where project_id = ? and path = ?""", args);
+    }
+
+    public int countEntities(long projectId) {
+        return count("select count(*) from code_entity where project_id = ?", projectId);
+    }
+
+    public int countEdges(long projectId) {
+        return count("select count(*) from dependency_edge where project_id = ?", projectId);
+    }
+
+    public int countParseErrors(long projectId) {
+        return count("select count(*) from source_file where project_id = ? and parse_error is not null", projectId);
+    }
+
+    private int count(String sql, long projectId) {
+        Integer n = jdbc.queryForObject(sql, Integer.class, projectId);
+        return n == null ? 0 : n;
+    }
+
+    private static Long[] ids(Collection<Long> ids) {
+        return ids.toArray(Long[]::new);
+    }
+
     private long[] nextIds(String sequence, int n) {
         if (n == 0) return new long[0];
         return jdbc.queryForList("select nextval('" + sequence + "') from generate_series(1, ?)", Long.class, n)

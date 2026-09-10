@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Predicate;
 
 @Component
 public class ProjectParser {
@@ -47,11 +48,17 @@ public class ProjectParser {
 
     // pass 2, parallel per type
     public AnalysisFacts resolve(List<ParsedFile> files, ExecutorService pool) {
+        return resolve(files, path -> true, pool);
+    }
+
+    // symbols from all files, facts only for types in matching files
+    public AnalysisFacts resolve(List<ParsedFile> files, Predicate<String> extractFor, ExecutorService pool) {
         var table = new SymbolTable(files);
         table.duplicates().forEach(d -> log.warn("duplicate type skipped: {}", d));
         var extractor = new FactExtractor(table);
 
         var futures = table.types().stream()
+                .filter(t -> extractFor.test(t.file().path()))
                 .map(t -> CompletableFuture.supplyAsync(() -> extractor.extract(t), pool))
                 .toList();
 

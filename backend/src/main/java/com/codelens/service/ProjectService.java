@@ -84,7 +84,8 @@ public class ProjectService {
         if (analysis.isRunning(id)) throw new ConflictException("analysis is running for project " + id);
         projects.delete(p);
         graphs.evict(id);
-        if (p.getSourceType() != SourceType.LOCAL) workspace.deleteQuietly(id);
+        // local sources live outside the workspace; only cache is removed
+        workspace.deleteQuietly(id);
     }
 
     private static Project newProject(String name, String fallback, SourceType type, String uri, String path,
