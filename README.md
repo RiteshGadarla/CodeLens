@@ -32,7 +32,7 @@ make prod-up        # full stack in docker
 make help           # all targets
 ```
 
-Dashboard on :5173, API on :8080 (Swagger at /swagger-ui.html), AI service on :8000.
+Dashboard on :5173, API on :8090 (Swagger at /swagger-ui.html), AI service on :8000.
 
 ### Dev (infra in Docker, apps local)
 
