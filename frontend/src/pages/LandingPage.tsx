@@ -1,8 +1,7 @@
 import {
-  ArrowRight, Check, Crosshair, FlaskConical, Gauge, GitBranch, Layers, Menu, Network, OctagonAlert, RefreshCw,
-  ShieldCheck, TriangleAlert, X,
+  ArrowRight, Check, Crosshair, FlaskConical, Gauge, GitBranch, Layers, Network, OctagonAlert, RefreshCw,
+  ShieldCheck, TriangleAlert,
 } from 'lucide-react'
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Logo } from '@/components/Logo'
 import { LyraIcon, LyraMark } from '@/components/Lyra'
@@ -77,56 +76,6 @@ const lyraPoints = [
 
 const stack = ['Java 21', 'Spring Boot 3', 'JavaParser', 'PostgreSQL', 'Redis', 'FastAPI', 'React 19', 'React Flow', 'Docker']
 
-function Nav() {
-  const { signedIn } = useAuth()
-  const [open, setOpen] = useState(false)
-  const actions = signedIn ? (
-    <Link to="/dashboard" className={primaryBtn}>
-      Open dashboard <ArrowRight className="size-4" />
-    </Link>
-  ) : (
-    <>
-      <Link to="/signin" className="px-2 text-sm font-medium text-slate-300 hover:text-white">
-        Sign in
-      </Link>
-      <Link to="/signup" className={primaryBtn}>
-        Get started
-      </Link>
-    </>
-  )
-  return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/85 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-8 px-6">
-        <Link to="/" className="flex items-center gap-2">
-          <Logo size={28} />
-          <span className="text-[15px] font-semibold tracking-tight text-white">CodeLens</span>
-        </Link>
-        <nav className="hidden items-center gap-7 text-sm text-slate-300 md:flex">
-          {navLinks.map((l) => (
-            <a key={l.href} href={l.href} className="transition hover:text-white">
-              {l.label}
-            </a>
-          ))}
-        </nav>
-        <div className="ml-auto hidden items-center gap-4 md:flex">{actions}</div>
-        <button type="button" onClick={() => setOpen((o) => !o)} className="ml-auto text-slate-300 md:hidden" aria-label="Menu" aria-expanded={open}>
-          {open ? <X className="size-5" /> : <Menu className="size-5" />}
-        </button>
-      </div>
-      {open && (
-        <div className="space-y-1 border-t border-white/10 px-6 py-4 md:hidden">
-          {navLinks.map((l) => (
-            <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="block py-1.5 text-sm text-slate-300">
-              {l.label}
-            </a>
-          ))}
-          <div className="flex items-center gap-4 pt-3">{actions}</div>
-        </div>
-      )}
-    </header>
-  )
-}
-
 function Hero() {
   const { signedIn } = useAuth()
   return (
@@ -136,7 +85,11 @@ function Hero() {
         aria-hidden
         className="pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)] opacity-20 [background-image:linear-gradient(to_right,#334155_1px,transparent_1px),linear-gradient(to_bottom,#334155_1px,transparent_1px)] [background-size:44px_44px]"
       />
-      <div className="relative mx-auto max-w-6xl px-6 pt-20 pb-24 text-center sm:pt-28">
+      <div className="relative mx-auto max-w-6xl px-6 pt-12 pb-24 text-center sm:pt-16">
+        <Link to="/" className="mx-auto mb-12 flex w-fit items-center gap-2.5">
+          <Logo size={36} />
+          <span className="text-xl font-semibold tracking-tight text-white">CodeLens</span>
+        </Link>
         <a href="#lyra" className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs text-slate-300 transition hover:bg-white/10">
           <LyraMark size={20} className="ring-white/20" /> Meet Lyra, the assistant that reads your dependency graph
           <ArrowRight className="size-3.5" />
@@ -324,7 +277,7 @@ function Proof() {
 
 function Features() {
   return (
-    <section id="features" className="scroll-mt-16 bg-slate-50">
+    <section id="features" className="bg-slate-50">
       <div className="mx-auto max-w-6xl px-6 py-24">
         <div className="max-w-2xl">
           <Eyebrow>Platform</Eyebrow>
@@ -352,7 +305,7 @@ function Features() {
 
 function HowItWorks() {
   return (
-    <section id="how" className="scroll-mt-16 border-y border-slate-200 bg-white">
+    <section id="how" className="border-y border-slate-200 bg-white">
       <div className="mx-auto max-w-6xl px-6 py-24">
         <div className="mx-auto max-w-2xl text-center">
           <Eyebrow>How it works</Eyebrow>
@@ -384,7 +337,7 @@ const Cite = ({ n }: { n: number }) => (
 
 function LyraSection() {
   return (
-    <section id="lyra" className="scroll-mt-16 bg-gradient-to-b from-violet-50/70 to-slate-50">
+    <section id="lyra" className="bg-gradient-to-b from-violet-50/70 to-slate-50">
       <div className="mx-auto grid max-w-6xl items-center gap-14 px-6 py-24 lg:grid-cols-2">
         <div>
           <div className="flex items-center gap-3">
@@ -467,7 +420,7 @@ function Scoring() {
     { level: 'HIGH' as const, icon: OctagonAlert, range: '60 and above' },
   ]
   return (
-    <section id="scoring" className="scroll-mt-16 border-t border-slate-200 bg-white">
+    <section id="scoring" className="border-t border-slate-200 bg-white">
       <div className="mx-auto grid max-w-6xl items-center gap-14 px-6 py-24 lg:grid-cols-2">
         <div>
           <Eyebrow>Risk scoring</Eyebrow>
@@ -596,7 +549,6 @@ function Footer() {
 export default function LandingPage() {
   return (
     <div className="bg-white">
-      <Nav />
       <main>
         <Hero />
         <Proof />
