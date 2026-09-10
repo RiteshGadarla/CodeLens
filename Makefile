@@ -21,7 +21,7 @@ env: ## create .env files from examples
 
 install: env ## install all deps
 	cd backend && ./mvnw -q -DskipTests dependency:go-offline
-	python3 -m venv $(VENV) && $(VENV)/bin/pip install -q -r ai-service/requirements.txt
+	python3 -m venv $(VENV) && $(VENV)/bin/pip install -q -r ai-service/requirements-dev.txt
 	cd frontend && npm install
 
 # infra
