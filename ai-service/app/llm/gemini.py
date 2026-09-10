@@ -36,7 +36,7 @@ class GeminiClient:
         limiter: RateLimiter,
         cache: DiskCache,
         http: httpx.AsyncClient,
-        max_output_tokens: int = 2048,
+        max_output_tokens: int = 8192,
         timeout: float = 120.0,
         retries: int = 2,
         backoff: float = 2.0,

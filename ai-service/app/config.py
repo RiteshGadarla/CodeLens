@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     llm_rpm: int = 20
     embed_rpm: int = 60
     max_context_chars: int = 24000
-    max_output_tokens: int = 2048
+    max_output_tokens: int = 8192
     llm_timeout: float = 120.0
 
     data_dir: Path = Path("./data")
