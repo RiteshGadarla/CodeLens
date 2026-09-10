@@ -1,18 +1,21 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type {
-  AskResponse, CreateProject, EntityDetail, EntityKind, EntitySummary, GraphView, Hotspot, Impact,
-  ModuleMetrics, Overview, PathResult, Project, Report, Run, RunMode, Source,
+  AskResponse, CreateProject, Dashboard, EntityDetail, EntityKind, EntitySummary, GraphView, Hotspot, Impact,
+  ModuleMetrics, Overview, PathResult, Project, Report, Run, RunMode, ServerConfig, Source,
 } from '@/types/api'
 import { api, qs } from './client'
 
 // every project-scoped key starts with ['p', id] so one invalidation refreshes all
 const pk = (projectId: number, ...rest: unknown[]) => ['p', projectId, ...rest]
 
-export const useProjects = () =>
+export const useConfig = () =>
+  useQuery({ queryKey: ['config'], queryFn: () => api<ServerConfig>('/config'), staleTime: Infinity })
+
+export const useDashboard = () =>
   useQuery({
-    queryKey: ['projects'],
-    queryFn: () => api<Project[]>('/projects'),
-    refetchInterval: (q) => (q.state.data?.some((p) => p.analyzing) ? 2000 : false),
+    queryKey: ['projects', 'dashboard'],
+    queryFn: () => api<Dashboard>('/dashboard'),
+    refetchInterval: (q) => (q.state.data?.projects.some((p) => p.analyzing) ? 2000 : false),
   })
 
 export const useProject = (id: number) =>

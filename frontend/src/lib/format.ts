@@ -1,5 +1,12 @@
 export const fmtInt = (n: number | null | undefined) => (n ?? 0).toLocaleString()
 
+const compact = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 })
+
+// 12400 -> 12.4K
+export const fmtCompact = (n: number | null | undefined) => compact.format(n ?? 0)
+
+export const fmtPct = (part: number, total: number) => (total === 0 ? '—' : `${Math.round((part / total) * 100)}%`)
+
 export const fmtScore = (n: number | null | undefined) => (n == null ? '—' : n.toFixed(1))
 
 export const fmtRatio = (n: number) => n.toFixed(2)

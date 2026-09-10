@@ -1,12 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Bot, ChartColumn, ChevronLeft, LayoutDashboard, LoaderCircle, Network, RefreshCw } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { ChartColumn, ChevronLeft, LayoutDashboard, LoaderCircle, Network, RefreshCw, Sparkles } from 'lucide-react'
+import { Suspense, useEffect, useRef } from 'react'
 import { Link, NavLink, Outlet, useNavigate, useOutletContext } from 'react-router-dom'
 import { invalidateProject, useAnalyze, useProject } from '@/api/queries'
 import { cn } from '@/lib/cn'
 import { fmtAgo, shortSha } from '@/lib/format'
 import { useProjectId } from '@/lib/hooks'
 import type { Project } from '@/types/api'
+import { UserMenu } from './AppHeader'
 import { EntityPicker } from './EntityPicker'
 import { Logo } from './Logo'
 import { StatusBadge } from './StatusBadge'
@@ -18,7 +19,7 @@ const nav = [
   { to: '', label: 'Overview', icon: LayoutDashboard, end: true },
   { to: 'graph', label: 'Dependency graph', icon: Network },
   { to: 'metrics', label: 'Metrics', icon: ChartColumn },
-  { to: 'assistant', label: 'AI assistant', icon: Bot },
+  { to: 'lyra', label: 'Lyra', icon: Sparkles },
 ]
 
 export function ProjectLayout() {
@@ -54,13 +55,13 @@ export function ProjectLayout() {
   return (
     <div className="flex h-full">
       <aside className="flex w-60 shrink-0 flex-col border-r border-slate-200 bg-white">
-        <Link to="/" className="flex items-center gap-2 px-4 py-4">
+        <Link to="/dashboard" className="flex items-center gap-2 px-4 py-4">
           <Logo size={26} />
           <span className="text-[15px] font-semibold tracking-tight text-slate-900">CodeLens</span>
         </Link>
         <div className="mx-3 mb-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5">
-          <Link to="/" className="mb-1 flex items-center gap-0.5 text-[11px] text-slate-400 hover:text-slate-600">
-            <ChevronLeft className="size-3" /> All projects
+          <Link to="/dashboard" className="mb-1 flex items-center gap-0.5 text-[11px] text-slate-400 hover:text-slate-600">
+            <ChevronLeft className="size-3" /> Dashboard
           </Link>
           <p className="truncate text-sm font-semibold text-slate-900" title={project?.name}>
             {project?.name ?? '…'}
@@ -90,12 +91,17 @@ export function ProjectLayout() {
             </NavLink>
           ))}
         </nav>
-        {project?.latestRun && (
-          <div className="mt-auto border-t border-slate-100 px-4 py-3 text-[11px] text-slate-500">
-            Last run {fmtAgo(project.latestRun.finishedAt ?? project.latestRun.startedAt)} ·{' '}
-            {project.latestRun.mode.toLowerCase()}
+        <div className="mt-auto border-t border-slate-100">
+          {project?.latestRun && (
+            <p className="px-4 pt-3 text-[11px] text-slate-500">
+              Last run {fmtAgo(project.latestRun.finishedAt ?? project.latestRun.startedAt)} ·{' '}
+              {project.latestRun.mode.toLowerCase()}
+            </p>
+          )}
+          <div className="p-2">
+            <UserMenu placement="above" showName />
           </div>
-        )}
+        </div>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
@@ -152,7 +158,9 @@ export function ProjectLayout() {
               <ErrorState error={error} />
             </div>
           ) : project ? (
-            <Outlet context={{ project }} />
+            <Suspense fallback={<Spinner />}>
+              <Outlet context={{ project }} />
+            </Suspense>
           ) : (
             <Spinner />
           )}

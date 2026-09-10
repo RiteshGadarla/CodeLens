@@ -210,6 +210,99 @@ export interface Hotspot {
   metrics: EntityMetrics
 }
 
+export interface User {
+  id: number
+  name: string
+  email: string
+  createdAt: string
+}
+
+export interface AuthResponse {
+  token: string
+  user: User
+}
+
+export interface ServerConfig {
+  allowLocalPaths: boolean
+}
+
+export interface OverviewKpis {
+  avgRisk: number
+  maxRisk: number
+  avgComplexity: number
+  maxComplexity: number
+  maxDepth: number
+  exposed: number
+  complexity: { label: string; count: number }[]
+}
+
+export interface ProjectKpi {
+  id: number
+  name: string
+  sourceType: SourceType
+  sourceUri: string | null
+  status: ProjectStatus
+  analyzing: boolean
+  files: number
+  loc: number
+  types: number
+  methods: number
+  endpoints: number
+  tests: number
+  edges: number
+  high: number
+  medium: number
+  low: number
+  avgRisk: number
+  maxRisk: number
+  lastRunStatus: RunStatus | null
+  lastRunAt: string | null
+  lastRunMs: number | null
+}
+
+export interface DayActivity {
+  day: string
+  success: number
+  failed: number
+  avgMs: number | null
+}
+
+export interface PortfolioHotspot {
+  projectId: number
+  projectName: string
+  entityId: number
+  label: string
+  kind: EntityKind
+  role: Stereotype | null
+  riskScore: number
+  dependents: number
+}
+
+export interface Dashboard {
+  totals: {
+    projects: number
+    ready: number
+    analyzing: number
+    failed: number
+    files: number
+    loc: number
+    types: number
+    methods: number
+    endpoints: number
+    tests: number
+    edges: number
+    high: number
+    medium: number
+    low: number
+    runs: number
+    failedRuns: number
+    avgRunMs: number | null
+  }
+  projects: ProjectKpi[]
+  activity: DayActivity[]
+  hotspots: PortfolioHotspot[]
+}
+
 export interface Overview {
   stats: {
     files: number
@@ -226,6 +319,7 @@ export interface Overview {
   kinds: Record<string, number>
   roles: Record<string, number>
   risk: { low: number; medium: number; high: number }
+  kpis: OverviewKpis
   topRisks: Hotspot[]
   modules: ModuleMetrics[]
   cycles: EntityRef[][]

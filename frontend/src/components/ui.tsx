@@ -116,6 +116,7 @@ export function Segmented<T extends string>({
       {options.map((o) => (
         <button
           key={o.value}
+          type="button"
           onClick={() => onChange(o.value)}
           className={cn(
             'rounded-md px-2.5 py-1 text-xs font-medium transition',
@@ -129,11 +130,56 @@ export function Segmented<T extends string>({
   )
 }
 
-// marks content produced by static analysis vs the LLM
+// headline number with an optional visual below
+export function KpiTile({
+  label,
+  icon,
+  value,
+  unit,
+  hint,
+  children,
+  className,
+}: {
+  label: string
+  icon?: ReactNode
+  value: ReactNode
+  unit?: string
+  hint?: ReactNode
+  children?: ReactNode
+  className?: string
+}) {
+  return (
+    <Card className={cn('flex min-w-0 flex-col p-5', className)}>
+      <div className="flex items-center justify-between gap-2 text-xs font-medium text-slate-500">
+        <span className="truncate">{label}</span>
+        {icon}
+      </div>
+      <div className="mt-2 flex items-baseline gap-1.5">
+        <span className="text-3xl font-semibold tracking-tight text-slate-900 tabular-nums">{value}</span>
+        {unit && <span className="text-sm text-slate-500">{unit}</span>}
+      </div>
+      {hint && <div className="mt-1 text-xs text-slate-500">{hint}</div>}
+      {children && <div className="mt-auto pt-4">{children}</div>}
+    </Card>
+  )
+}
+
+// change vs previous run; neutral ink, growth is not good or bad by itself
+export function Delta({ value, format = (v: number) => v.toLocaleString() }: { value: number | null; format?: (v: number) => string }) {
+  if (value == null) return null
+  if (value === 0) return <span className="text-slate-400">no change</span>
+  return (
+    <span className="font-medium text-slate-600 tabular-nums">
+      {value > 0 ? '▲' : '▼'} {format(Math.abs(value))}
+    </span>
+  )
+}
+
+// marks content produced by static analysis vs Lyra
 export function Provenance({ kind, model }: { kind: 'static' | 'ai'; model?: string | null }) {
   return kind === 'static' ? (
     <Badge className="bg-slate-100 text-slate-700 ring-slate-300">Static analysis</Badge>
   ) : (
-    <Badge className="bg-violet-50 text-violet-700 ring-violet-200">AI generated{model ? ` · ${model}` : ''}</Badge>
+    <Badge className="bg-violet-50 text-violet-700 ring-violet-200">Lyra{model ? ` · ${model}` : ''}</Badge>
   )
 }

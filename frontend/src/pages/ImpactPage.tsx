@@ -22,8 +22,8 @@ function ReportCard({ projectId, entityId }: { projectId: number; entityId: numb
   return (
     <Card>
       <CardHeader
-        title="AI impact report"
-        subtitle="Narrative written by the model from the analysis above and retrieved source"
+        title="Lyra impact report"
+        subtitle="Narrative written by Lyra from the analysis above and retrieved source"
         action={
           <Button variant={report ? 'secondary' : 'primary'} loading={generate.isPending} onClick={() => generate.mutate(entityId)}>
             <Sparkles className="size-4" /> {report ? 'Regenerate' : 'Generate report'}
@@ -33,12 +33,12 @@ function ReportCard({ projectId, entityId }: { projectId: number; entityId: numb
       <div className="px-5 py-4">
         {error && (
           <ErrorState
-            error={error instanceof ApiError && error.status === 503 ? new Error(`AI service unavailable: ${error.message}`) : error}
+            error={error instanceof ApiError && error.status === 503 ? new Error(`Lyra is unavailable right now: ${error.message}`) : error}
           />
         )}
         {generate.isPending && (
           <p className="flex items-center gap-2 text-sm text-slate-500">
-            <Sparkles className="size-4 animate-pulse text-violet-500" /> Writing report…
+            <Sparkles className="size-4 animate-pulse text-violet-500" /> Lyra is writing the report…
           </p>
         )}
         {!report && !generate.isPending && !error && (

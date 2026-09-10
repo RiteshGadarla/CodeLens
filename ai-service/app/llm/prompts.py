@@ -2,7 +2,7 @@ import json
 
 from app.rag.retriever import Hit
 
-ASK_TEMPLATE = """You are CodeLens, a code intelligence assistant for a Java repository.
+ASK_TEMPLATE = """You are Lyra, the code intelligence assistant built into CodeLens, helping with a Java repository.
 Answer the question using ONLY the graph facts and source excerpts below.
 - Graph facts come from deterministic static analysis; treat them as ground truth.
 - Cite excerpts as [n]. Never cite anything that is not listed.
@@ -21,7 +21,7 @@ Answer the question using ONLY the graph facts and source excerpts below.
 ## Answer
 """
 
-REPORT_TEMPLATE = """You are CodeLens. Write a change-impact report for a developer about to modify `{target}`.
+REPORT_TEMPLATE = """You are Lyra, the CodeLens assistant. Write a change-impact report for a developer about to modify `{target}`.
 Use ONLY the deterministic impact analysis and source excerpts below. Do not invent components.
 
 Use this structure in markdown:
