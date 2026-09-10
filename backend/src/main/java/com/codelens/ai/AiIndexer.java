@@ -63,7 +63,7 @@ public class AiIndexer {
 
     // paths == null rebuilds the index; returns chunks sent
     public int index(long projectId, Set<String> paths, Set<String> removed) {
-        synchronized (locks.computeIfAbsent(projectId, k -> new Object())) {
+        synchronized (lock(projectId)) {
             Project p = projects.findById(projectId).orElseThrow(() -> new NotFoundException("project", projectId));
             var byFile = chunks.build(projectId, Path.of(p.getLocalPath()), paths);
 
@@ -93,7 +93,14 @@ public class AiIndexer {
         }
     }
 
+    // blocks while this project is being indexed, so answers never use a half-built index
     public void ensureIndexed(long projectId) {
-        if (ai.stats(projectId).chunks() == 0) index(projectId, null, Set.of());
+        synchronized (lock(projectId)) {
+            if (ai.stats(projectId).chunks() == 0) index(projectId, null, Set.of());
+        }
+    }
+
+    private Object lock(long projectId) {
+        return locks.computeIfAbsent(projectId, k -> new Object());
     }
 }
