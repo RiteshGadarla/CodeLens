@@ -1,4 +1,7 @@
 # infra only; run apps locally
+# own project name, so infra-reset never touches the prod stack's volumes
+name: codelens-dev
+
 services:
   postgres:
     image: postgres:16-alpine
