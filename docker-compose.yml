@@ -2,7 +2,6 @@ services:
   postgres:
     image: postgres:16-alpine
     env_file: ./backend/.env
-    ports: ["5432:5432"]
     volumes: [pgdata:/var/lib/postgresql/data]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
@@ -11,7 +10,6 @@ services:
 
   redis:
     image: redis:7-alpine
-    ports: ["6379:6379"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -22,7 +20,6 @@ services:
     env_file: ./ai-service/.env
     environment:
       DATA_DIR: /app/data
-    ports: ["8000:8000"]
     volumes: [aidata:/app/data]
 
   backend:

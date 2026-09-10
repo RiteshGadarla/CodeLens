@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     # local = fastembed, no api quota
     embed_provider: str = "local"
     local_embed_model: str = "BAAI/bge-small-en-v1.5"
+    # defaults to data_dir/models; images bake the model elsewhere
+    models_dir: Path | None = None
 
     # free-tier guards
     llm_rpm: int = 20

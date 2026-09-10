@@ -37,7 +37,7 @@ class Services:
         if s.embed_provider == "gemini":
             embedder: Embedder = GeminiEmbedder(s.gemini_api_key, s.gemini_embed_model, RateLimiter(s.embed_rpm), http)
         else:
-            embedder = LocalEmbedder(s.local_embed_model, s.data_dir / "models")
+            embedder = LocalEmbedder(s.local_embed_model, s.models_dir or s.data_dir / "models")
         llm = GeminiClient(
             api_key=s.gemini_api_key,
             model=s.gemini_model,
