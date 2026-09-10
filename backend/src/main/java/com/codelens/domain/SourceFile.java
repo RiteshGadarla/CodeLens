@@ -13,8 +13,7 @@ import lombok.Setter;
 public class SourceFile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "source_file_seq")
-    @SequenceGenerator(name = "source_file_seq", sequenceName = "source_file_seq", allocationSize = 50)
+    // assigned by GraphStore
     private Long id;
 
     @Column(nullable = false)

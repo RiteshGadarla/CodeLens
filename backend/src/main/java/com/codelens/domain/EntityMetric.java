@@ -25,4 +25,5 @@ public class EntityMetric {
     private int depth;
     private int complexity;
     private double riskScore;
+    private boolean exposed;
 }

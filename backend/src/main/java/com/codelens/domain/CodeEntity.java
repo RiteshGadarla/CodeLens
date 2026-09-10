@@ -13,8 +13,7 @@ import lombok.Setter;
 public class CodeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "code_entity_seq")
-    @SequenceGenerator(name = "code_entity_seq", sequenceName = "code_entity_seq", allocationSize = 50)
+    // assigned by GraphStore
     private Long id;
 
     @Column(nullable = false)

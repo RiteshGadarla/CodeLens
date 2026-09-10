@@ -21,6 +21,8 @@
     <javaparser.version>3.26.2</javaparser.version>
     <jgit.version>6.10.0.202406032230-r</jgit.version>
     <springdoc.version>2.6.0</springdoc.version>
+    <!-- docker 29 needs api >= 1.40 -->
+    <testcontainers.version>1.21.4</testcontainers.version>
   </properties>
 
   <dependencies>

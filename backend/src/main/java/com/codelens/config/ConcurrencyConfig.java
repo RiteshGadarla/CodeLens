@@ -17,4 +17,10 @@ public class ConcurrencyConfig {
                 : Runtime.getRuntime().availableProcessors();
         return Executors.newFixedThreadPool(n, Thread.ofPlatform().name("analysis-", 0).daemon().factory());
     }
+
+    // analysis jobs: io + orchestration
+    @Bean(destroyMethod = "shutdown")
+    ExecutorService jobExecutor() {
+        return Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("job-", 0).factory());
+    }
 }
