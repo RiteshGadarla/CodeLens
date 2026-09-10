@@ -45,7 +45,7 @@ export function RiskDistributionBar({ low, medium, high, compact }: { low: numbe
     { level: 'LOW', value: low },
   ]
   const total = low + medium + high
-  if (total === 0) return compact ? <span className="text-xs text-slate-400">—</span> : <p className="text-sm text-slate-500">No scored entities yet.</p>
+  if (total === 0) return compact ? <span className="text-xs text-slate-400">-</span> : <p className="text-sm text-slate-500">No scored entities yet.</p>
 
   let offset = 0
   return (

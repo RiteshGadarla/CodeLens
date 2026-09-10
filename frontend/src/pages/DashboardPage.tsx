@@ -77,7 +77,7 @@ function ProjectRow({ p, maxLoc }: { p: ProjectKpi; maxLoc: number }) {
           <RiskDistributionBar high={p.high} medium={p.medium} low={p.low} compact />
         </div>
       </td>
-      <td className="px-3 py-3 text-right">{p.maxRisk > 0 ? <RiskBadge score={p.maxRisk} level={riskLevel(p.maxRisk)} /> : <span className="text-slate-400">—</span>}</td>
+      <td className="px-3 py-3 text-right">{p.maxRisk > 0 ? <RiskBadge score={p.maxRisk} level={riskLevel(p.maxRisk)} /> : <span className="text-slate-400">-</span>}</td>
       <td className="px-3 py-3 text-xs whitespace-nowrap text-slate-500">
         {p.lastRunAt ? (
           <span className="flex items-center gap-1.5">
@@ -151,7 +151,7 @@ function Portfolio({ data }: { data: Dashboard }) {
         <Stat label="Dependencies" value={<span title={fmtInt(t.edges)}>{fmtCompact(t.edges)}</span>} />
         <Stat label="Test classes" value={fmtInt(t.tests)} hint={t.types ? `${fmtPct(t.tests, t.types)} of types` : undefined} />
         <Stat label="High-risk components" value={fmtInt(t.high)} />
-        <Stat label="Peak risk score" value={peak ? peak.toFixed(0) : '—'} hint={peak ? riskLevel(peak).toLowerCase() : undefined} />
+        <Stat label="Peak risk score" value={peak ? peak.toFixed(0) : '-'} hint={peak ? riskLevel(peak).toLowerCase() : undefined} />
         <Stat label="Failed runs · 14 days" value={fmtInt(t.failedRuns)} />
       </Card>
 

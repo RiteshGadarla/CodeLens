@@ -184,7 +184,7 @@ Each service reads its own `.env`, and a committed `.env.example` sits beside it
 
 | Variable | Default | Description |
 |---|---|---|
-| `GEMINI_API_KEY` | — | Required for Lyra answers and reports |
+| `GEMINI_API_KEY` | - | Required for Lyra answers and reports |
 | `GEMINI_MODEL` | `gemma-4-26b-a4b-it` | Primary model |
 | `GEMINI_FALLBACK_MODEL` | `gemini-2.5-flash-lite` | Used when the primary fails |
 | `EMBED_PROVIDER` | `local` | `local` (fastembed) or `gemini` |
