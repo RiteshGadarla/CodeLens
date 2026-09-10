@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/logo.svg" width="72" height="72" alt="CodeLens logo" />
+<img src="docs/assets/codelens.png" width="88" height="88" alt="CodeLens logo" />
 
 # CodeLens
 
@@ -43,7 +43,7 @@ CodeLens parses a Java repository into a typed dependency graph of classes, meth
 | 📊 | **Explainable risk** | 0–100 score per type and method from five published, weighted factors. |
 | ⚡ | **Incremental analysis** | Files are diffed by SHA-256. Only changed files are re-parsed, their dependents are re-resolved, and the database is patched in place. |
 | 🏛️ | **Architecture metrics** | Fan-in/out, depth, cyclomatic complexity, Tarjan cycle detection, and Martin's Ca, Ce, instability, abstractness and distance per package and module. |
-| ✨ | **Lyra assistant** | Hybrid RAG over locally embedded code, grounded in graph facts. Answers carry numbered citations, and you can generate stored impact reports. |
+| <img src="docs/assets/lyra.png" width="20" alt="" /> | **Lyra assistant** | Hybrid RAG over locally embedded code, grounded in graph facts. Answers carry numbered citations, and you can generate stored impact reports. |
 | 📈 | **KPI dashboards** | A portfolio view (risk mix, run activity, riskiest types) and a per-project view (low-risk share, cycles, complexity distribution, run trends). |
 | 🔐 | **Accounts** | Sign up and sign in with JWT bearer tokens and BCrypt passwords. Projects are private to their owner. |
 | 📦 | **Flexible ingestion** | Git URL (shallow clone, fast pull), zip upload (zip-slip safe) or a local directory. |
