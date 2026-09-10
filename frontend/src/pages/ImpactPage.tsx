@@ -81,6 +81,7 @@ export default function ImpactPage() {
   const [depth, setDepth] = useState(10)
   const [includeTests, setIncludeTests] = useState(false)
   const [showAll, setShowAll] = useState(false)
+  const [allEndpoints, setAllEndpoints] = useState(false)
   const { data, isLoading, error, isFetching } = useImpact(projectId, entityId, depth, includeTests)
 
   if (isLoading) return <Spinner label="Traversing dependents…" />
@@ -191,12 +192,20 @@ export default function ImpactPage() {
           <EmptyState icon={<Globe className="size-8" />} title="No API endpoints affected" />
         ) : (
           <ul className="divide-y divide-slate-100">
-            {data.endpoints.map((a) => (
+            {(allEndpoints ? data.endpoints : data.endpoints.slice(0, 4)).map((a) => (
               <li key={a.entity.id} className="px-5 py-3">
                 <p className="mb-1.5 font-mono text-sm font-semibold text-slate-800">{a.entity.label}</p>
                 <PathChain steps={a.path} projectId={projectId} />
               </li>
             ))}
+            {data.endpoints.length > 4 && !allEndpoints && (
+              <li className="flex flex-wrap items-center gap-1.5 px-5 py-2.5">
+                {data.endpoints.slice(4).map((a) => (
+                  <Badge key={a.entity.id} className="bg-slate-50 font-mono text-slate-600 ring-slate-200">{a.entity.label}</Badge>
+                ))}
+                <Button variant="ghost" onClick={() => setAllEndpoints(true)}>Show paths</Button>
+              </li>
+            )}
           </ul>
         )}
       </Card>

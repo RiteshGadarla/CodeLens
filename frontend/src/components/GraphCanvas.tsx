@@ -78,9 +78,7 @@ export function GraphCanvas({
         id,
         source: m.source,
         target: m.target,
-        label: m.types.map((t) => edgeLabel[t]).join(', '),
-        labelStyle: { fontSize: 9, fill: '#64748b' },
-        labelBgStyle: { fill: '#f8fafc' },
+        ariaLabel: m.types.map((t) => edgeLabel[t]).join(', '),
         style: { stroke: color, strokeWidth: 1 + Math.min(2.5, Math.log2(m.weight + 1) / 2) },
         markerEnd: { type: MarkerType.ArrowClosed, color, width: 14, height: 14 },
       }

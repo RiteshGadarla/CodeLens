@@ -65,7 +65,7 @@ export default function MetricsPage() {
                   <th className="px-3 py-2 text-left font-medium">Entity</th>
                   <th className="px-3 py-2 text-left font-medium">Role</th>
                   {COLUMNS.map((c) => (
-                    <th key={c.key} className="px-3 py-2 text-right font-medium">
+                    <th key={c.key} className="px-3 py-2 text-right font-medium whitespace-nowrap">
                       <button
                         onClick={() => setSort(c.key)}
                         className={cn('inline-flex items-center gap-0.5 hover:text-slate-900', sort === c.key && 'text-slate-900')}

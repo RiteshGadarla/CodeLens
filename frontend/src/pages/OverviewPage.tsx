@@ -1,6 +1,6 @@
 import { Crosshair, GitCommitHorizontal, Repeat } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useOverview, useRuns } from '@/api/queries'
+import { useModules, useOverview, useRuns } from '@/api/queries'
 import { RiskDistributionBar } from '@/components/charts'
 import { KindIcon, RiskBadge, RoleBadge } from '@/components/EntityBadges'
 import { useProjectContext } from '@/components/ProjectLayout'
@@ -16,6 +16,7 @@ export default function OverviewPage() {
   const { project } = useProjectContext()
   const { data, isLoading, error, isFetching } = useOverview(projectId)
   const { data: runs } = useRuns(projectId)
+  const { data: packages } = useModules(projectId, 'PACKAGE')
 
   if (isLoading) return <Spinner />
   if (error) return <div className="p-6"><ErrorState error={error} /></div>
@@ -32,6 +33,11 @@ export default function OverviewPage() {
   }
 
   const s = data.stats
+  // one build module says nothing; show the packages furthest from the main sequence instead
+  const byPackage = data.modules.length <= 1
+  const coupling = byPackage
+    ? [...(packages?.items ?? [])].sort((a, b) => b.distance - a.distance).slice(0, 8)
+    : data.modules
   return (
     <div className={`mx-auto max-w-7xl space-y-5 p-6 transition-opacity ${isFetching ? 'opacity-60' : ''}`}>
       <div className="flex items-center justify-between">
@@ -145,20 +151,24 @@ export default function OverviewPage() {
 
       <div className="grid gap-5 lg:grid-cols-2">
         <Card>
-          <CardHeader title="Module coupling" subtitle="Afferent (Ca), efferent (Ce), instability, abstractness, distance" />
+          <CardHeader
+            title={byPackage ? 'Package coupling' : 'Module coupling'}
+            subtitle={byPackage ? 'Packages furthest from the main sequence (D)' : 'Afferent (Ca), efferent (Ce), instability, abstractness, distance'}
+            action={<Link to="metrics" className="text-xs font-medium text-indigo-600 hover:underline">Details</Link>}
+          />
           <table className="w-full text-sm">
             <thead className="border-b border-slate-100 text-xs text-slate-500">
               <tr>
-                <th className="px-5 py-2 text-left font-medium">Module</th>
+                <th className="px-5 py-2 text-left font-medium">{byPackage ? 'Package' : 'Module'}</th>
                 {['Types', 'Ca', 'Ce', 'I', 'A', 'D'].map((h) => (
                   <th key={h} className="px-3 py-2 text-right font-medium">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {data.modules.map((m) => (
+              {coupling.map((m) => (
                 <tr key={m.name}>
-                  <td className="px-5 py-2 font-mono text-[13px]">{m.name}</td>
+                  <td className="max-w-56 truncate px-5 py-2 font-mono text-[13px]" title={m.name}>{m.name}</td>
                   <td className="px-3 py-2 text-right tabular-nums">{m.entities}</td>
                   <td className="px-3 py-2 text-right tabular-nums">{m.afferent}</td>
                   <td className="px-3 py-2 text-right tabular-nums">{m.efferent}</td>
