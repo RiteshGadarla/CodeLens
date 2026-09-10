@@ -22,13 +22,17 @@ public interface CodeEntityRepository extends JpaRepository<CodeEntity, Long> {
 
     long countByProjectId(Long projectId);
 
+    // pattern/prefix are pre-escaped with '!'
     @Query("""
             select e from CodeEntity e
             where e.projectId = :projectId
               and e.kind in :kinds
-              and (lower(e.name) like lower(concat('%', :q, '%'))
-                   or lower(e.qualifiedName) like lower(concat('%', :q, '%')))
-            order by length(e.name), e.name
+              and (lower(e.name) like :pattern escape '!' or lower(e.qualifiedName) like :pattern escape '!')
+            order by case when lower(e.name) = :exact then 0
+                          when lower(e.name) like :prefix escape '!' then 1
+                          else 2 end,
+                     length(e.name), e.name
             """)
-    List<CodeEntity> search(Long projectId, String q, Collection<EntityKind> kinds, Pageable page);
+    List<CodeEntity> search(Long projectId, Collection<EntityKind> kinds, String pattern, String exact, String prefix,
+                            Pageable page);
 }
