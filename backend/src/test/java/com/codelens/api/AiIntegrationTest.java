@@ -8,9 +8,9 @@ import com.codelens.support.IntegrationTest;
 import com.codelens.support.SampleProject;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -29,7 +29,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
 @TestPropertySource(properties = "codelens.ai.enabled=true")
 class AiIntegrationTest extends IntegrationTest {
 
@@ -40,8 +39,8 @@ class AiIntegrationTest extends IntegrationTest {
         registry.add("codelens.ai.base-url", AI::url);
     }
 
-    @Autowired
     MockMvc mvc;
+    Long owner;
     @Autowired
     ObjectMapper json;
     @Autowired
@@ -50,6 +49,13 @@ class AiIntegrationTest extends IntegrationTest {
     AnalysisService analysis;
     @Autowired
     JdbcTemplate jdbc;
+
+    @BeforeEach
+    void signedIn() {
+        var session = signUp("ai");
+        owner = session.user().getId();
+        mvc = mvcAs(session.token());
+    }
 
     @Test
     void analysisIndexesMethodAndTypeChunks() throws Exception {
@@ -119,13 +125,13 @@ class AiIntegrationTest extends IntegrationTest {
 
     @Test
     void validatesQuestion() throws Exception {
-        long project = projects.createLocal("ai-validate", SampleProject.root().toString()).getId();
+        long project = projects.createLocal(owner, "ai-validate", SampleProject.root().toString()).getId();
         mvc.perform(post("/api/projects/{id}/ask", project).contentType(APPLICATION_JSON).content("{\"question\":\"\"}"))
                 .andExpect(status().isBadRequest());
     }
 
     private long analyzed(String name) throws InterruptedException {
-        long project = projects.createLocal(name, SampleProject.root().toString()).getId();
+        long project = projects.createLocal(owner, name, SampleProject.root().toString()).getId();
         analysis.runNow(project, RunMode.FULL);
         awaitIndexed(project);
         return project;

@@ -50,6 +50,12 @@ springdoc:
 
 codelens:
   repos-dir: ${REPOS_DIR:./data/repos}
+  # off on shared servers: local paths and file: git urls read the server disk
+  allow-local-paths: ${ALLOW_LOCAL_PATHS:true}
+  auth:
+    # blank = random key per start, sessions end on restart
+    jwt-secret: ${JWT_SECRET:}
+    token-ttl: 7d
   ai:
     base-url: ${AI_SERVICE_URL:http://localhost:8000}
     timeout: 120s

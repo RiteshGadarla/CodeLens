@@ -1,16 +1,20 @@
 package com.codelens.config;
 
+import com.codelens.auth.ProjectAccessInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
     private final CodeLensProperties props;
+    private final ProjectAccessInterceptor projectAccess;
 
-    public WebConfig(CodeLensProperties props) {
+    public WebConfig(CodeLensProperties props, ProjectAccessInterceptor projectAccess) {
         this.props = props;
+        this.projectAccess = projectAccess;
     }
 
     @Override
@@ -18,5 +22,10 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/api/**")
                 .allowedOrigins(props.cors().allowedOrigins().toArray(String[]::new))
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(projectAccess).addPathPatterns("/api/projects/**");
     }
 }

@@ -72,16 +72,37 @@ public class MetricsQueryService {
             }
         }
 
-        int low = 0, medium = 0, high = 0;
+        int low = 0, medium = 0, high = 0, exposed = 0, maxDepth = 0, maxComplexity = 0, scored = 0, scoredMethods = 0;
+        double riskSum = 0, maxRisk = 0;
+        long complexitySum = 0;
+        int[] buckets = new int[COMPLEXITY_BOUNDS.length];
         for (EntityMetric m : metrics.findByProjectId(projectId)) {
             var node = g.find(m.getEntityId());
-            if (node.isEmpty() || !(node.get().kind().isType() || METHODS.contains(node.get().kind()))) continue;
+            if (node.isEmpty()) continue;
+            boolean method = METHODS.contains(node.get().kind());
+            if (!(node.get().kind().isType() || method)) continue;
             switch (RiskScorer.level(m.getRiskScore())) {
                 case "HIGH" -> high++;
                 case "MEDIUM" -> medium++;
                 default -> low++;
             }
+            scored++;
+            riskSum += m.getRiskScore();
+            maxRisk = Math.max(maxRisk, m.getRiskScore());
+            maxDepth = Math.max(maxDepth, m.getDepth());
+            if (m.isExposed()) exposed++;
+            if (method) {
+                scoredMethods++;
+                complexitySum += m.getComplexity();
+                maxComplexity = Math.max(maxComplexity, m.getComplexity());
+                buckets[bucket(m.getComplexity())]++;
+            }
         }
+        var complexity = new ArrayList<OverviewDto.Bucket>();
+        for (int i = 0; i < buckets.length; i++) complexity.add(new OverviewDto.Bucket(COMPLEXITY_LABELS[i], buckets[i]));
+        var kpis = new OverviewDto.Kpis(scored == 0 ? 0 : riskSum / scored, maxRisk,
+                scoredMethods == 0 ? 0 : (double) complexitySum / scoredMethods, maxComplexity, maxDepth, exposed,
+                complexity);
 
         var fs = files.stats(projectId);
         DependencyGraph typeGraph = graphs.types(projectId);
@@ -91,7 +112,7 @@ public class MetricsQueryService {
 
         var stats = new OverviewDto.Stats(nz(fs.getFiles()), nz(fs.getLoc()), nz(fs.getParseErrors()), types, methods,
                 endpoints, tests, g.edgeCount(), moduleNames.size(), packageNames.size());
-        return new OverviewDto(stats, kinds, roles, new OverviewDto.RiskDistribution(low, medium, high),
+        return new OverviewDto(stats, kinds, roles, new OverviewDto.RiskDistribution(low, medium, high), kpis,
                 hotspots(projectId, Scope.ALL, "riskScore", 10).items(),
                 modules(projectId, MetricLevel.MODULE).items(), cycles);
     }
@@ -127,6 +148,16 @@ public class MetricsQueryService {
                 .map(m -> new ModuleMetrics(m.getLevel(), m.getName(), m.getEntities(), m.getAfferent(), m.getEfferent(),
                         m.getInstability(), m.getAbstractness(), m.getDistance()))
                 .toList());
+    }
+
+    // mccabe bands: simple, moderate, complex, very complex, untestable
+    private static final int[] COMPLEXITY_BOUNDS = {1, 4, 9, 19, Integer.MAX_VALUE};
+    private static final String[] COMPLEXITY_LABELS = {"1", "2-4", "5-9", "10-19", "20+"};
+
+    private static int bucket(int complexity) {
+        int i = 0;
+        while (complexity > COMPLEXITY_BOUNDS[i]) i++;
+        return i;
     }
 
     private static long nz(Long v) {

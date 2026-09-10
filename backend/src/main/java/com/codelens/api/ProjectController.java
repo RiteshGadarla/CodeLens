@@ -3,6 +3,7 @@ package com.codelens.api;
 import com.codelens.api.dto.CreateProjectRequest;
 import com.codelens.api.dto.ProjectDto;
 import com.codelens.api.dto.RunDto;
+import com.codelens.auth.CurrentUser;
 import com.codelens.domain.Project;
 import com.codelens.domain.RunMode;
 import com.codelens.repository.AnalysisRunRepository;
@@ -22,6 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/projects")
+// ownership of {id} is checked by ProjectAccessInterceptor
 @Tag(name = "Projects", description = "Repository ingestion and analysis runs")
 public class ProjectController {
 
@@ -37,7 +39,7 @@ public class ProjectController {
 
     @GetMapping
     public List<ProjectDto> list() {
-        return projects.list().stream().map(this::dto).toList();
+        return projects.list(CurrentUser.id()).stream().map(this::dto).toList();
     }
 
     @PostMapping
@@ -45,8 +47,8 @@ public class ProjectController {
     @Operation(summary = "Register a local directory or git repository")
     public ProjectDto create(@Valid @RequestBody CreateProjectRequest req) {
         Project p = switch (req.sourceType()) {
-            case LOCAL -> projects.createLocal(req.name(), req.path());
-            case GIT -> projects.createGit(req.name(), req.url(), req.branch());
+            case LOCAL -> projects.createLocal(CurrentUser.id(), req.name(), req.path());
+            case GIT -> projects.createGit(CurrentUser.id(), req.name(), req.url(), req.branch());
             case UPLOAD -> throw new IllegalArgumentException("upload archives with POST /api/projects/upload");
         };
         if (!Boolean.FALSE.equals(req.analyze())) analysis.start(p.getId(), RunMode.FULL);
@@ -60,7 +62,7 @@ public class ProjectController {
                              @RequestParam(defaultValue = "true") boolean analyze) {
         Project p;
         try {
-            p = projects.createUpload(name, file.getOriginalFilename(), file.getInputStream());
+            p = projects.createUpload(CurrentUser.id(), name, file.getOriginalFilename(), file.getInputStream());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

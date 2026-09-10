@@ -32,7 +32,7 @@ class IncrementalAnalysisIntegrationTest extends IntegrationTest {
     @Test
     void incrementalRunMatchesFullAnalysisOfSameTree() throws IOException {
         Path repo = copySample();
-        long project = projects.createLocal("inc", repo.toString()).getId();
+        long project = projects.createLocal(NO_OWNER, "inc", repo.toString()).getId();
         analysis.runNow(project, RunMode.FULL);
         long userId = entityId(project, SampleProject.USER);
 
@@ -69,7 +69,7 @@ class IncrementalAnalysisIntegrationTest extends IntegrationTest {
         assertThat(run.getFilesDeleted()).isEqualTo(1);
         assertThat(entityId(project, SampleProject.USER)).isEqualTo(userId);
 
-        long reference = projects.createLocal("reference", repo.toString()).getId();
+        long reference = projects.createLocal(NO_OWNER, "reference", repo.toString()).getId();
         analysis.runNow(reference, RunMode.FULL);
 
         assertThat(entities(project)).containsExactlyInAnyOrderElementsOf(entities(reference));
@@ -81,7 +81,7 @@ class IncrementalAnalysisIntegrationTest extends IntegrationTest {
 
     @Test
     void unchangedTreeIsANoOp() throws IOException {
-        long project = projects.createLocal("noop", copySample().toString()).getId();
+        long project = projects.createLocal(NO_OWNER, "noop", copySample().toString()).getId();
         analysis.runNow(project, RunMode.FULL);
         long userId = entityId(project, SampleProject.USER);
 
@@ -95,7 +95,7 @@ class IncrementalAnalysisIntegrationTest extends IntegrationTest {
 
     @Test
     void incrementalWithoutHistoryFallsBackToFull() throws IOException {
-        long project = projects.createLocal("first", copySample().toString()).getId();
+        long project = projects.createLocal(NO_OWNER, "first", copySample().toString()).getId();
         var run = analysis.runNow(project, RunMode.INCREMENTAL);
         assertThat(run.getStatus()).isEqualTo(RunStatus.SUCCESS);
         assertThat(run.getMode()).isEqualTo(RunMode.FULL);

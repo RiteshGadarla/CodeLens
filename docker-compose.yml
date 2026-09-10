@@ -30,6 +30,8 @@ services:
       REDIS_HOST: redis
       AI_SERVICE_URL: http://ai-service:8000
       REPOS_DIR: /var/codelens/repos
+      # container disk means nothing to users
+      ALLOW_LOCAL_PATHS: "false"
     depends_on:
       postgres: {condition: service_healthy}
       redis: {condition: service_healthy}

@@ -39,7 +39,7 @@ class CachingIntegrationTest extends IntegrationTest {
 
     @Test
     void impactIsCachedPerGraphVersion() {
-        long project = projects.createLocal("cache", SampleProject.root().toString()).getId();
+        long project = projects.createLocal(NO_OWNER, "cache", SampleProject.root().toString()).getId();
         analysis.runNow(project, RunMode.FULL);
         String pattern = "codelens:impact::" + project + ":*";
 

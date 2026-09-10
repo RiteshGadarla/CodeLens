@@ -1,6 +1,3 @@
-PLAN.md
-BUILD_PLAN.md
-
 # env
 .env
 *.env
@@ -30,3 +27,7 @@ repos/
 .idea/
 .vscode/
 *.iml
+
+# Plan Files
+PLAN.md
+BUILD_PLAN.md

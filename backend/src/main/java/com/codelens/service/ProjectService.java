@@ -7,8 +7,8 @@ import com.codelens.domain.SourceType;
 import com.codelens.ingest.Workspace;
 import com.codelens.ingest.ZipExtractor;
 import com.codelens.repository.ProjectRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -30,45 +30,51 @@ public class ProjectService {
     private final AnalysisService analysis;
     private final GraphService graphs;
     private final ApplicationEventPublisher events;
+    private final boolean allowLocalPaths;
 
     public ProjectService(ProjectRepository projects, Workspace workspace, ZipExtractor zips,
-                          AnalysisService analysis, GraphService graphs, ApplicationEventPublisher events) {
+                          AnalysisService analysis, GraphService graphs, ApplicationEventPublisher events,
+                          @Value("${codelens.allow-local-paths:true}") boolean allowLocalPaths) {
         this.projects = projects;
         this.workspace = workspace;
         this.zips = zips;
         this.analysis = analysis;
         this.graphs = graphs;
         this.events = events;
+        this.allowLocalPaths = allowLocalPaths;
     }
 
-    public List<Project> list() {
-        return projects.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
+    public List<Project> list(long ownerId) {
+        return projects.findByOwnerIdOrderByCreatedAtDesc(ownerId);
     }
 
     public Project get(long id) {
         return projects.findById(id).orElseThrow(() -> new NotFoundException("project", id));
     }
 
-    public Project createLocal(String name, String path) {
+    public Project createLocal(Long ownerId, String name, String path) {
+        requireLocalPaths();
         if (path == null || path.isBlank()) throw new IllegalArgumentException("path is required");
         Path dir = Path.of(path).toAbsolutePath().normalize();
         if (!Files.isDirectory(dir)) throw new IllegalArgumentException("directory not found: " + path);
-        return projects.save(newProject(name, String.valueOf(dir.getFileName()), SourceType.LOCAL, dir.toString(),
-                dir.toString(), null));
+        return projects.save(newProject(ownerId, name, String.valueOf(dir.getFileName()), SourceType.LOCAL,
+                dir.toString(), dir.toString(), null));
     }
 
-    public Project createGit(String name, String url, String branch) {
+    public Project createGit(Long ownerId, String name, String url, String branch) {
         if (url == null || !GIT_URL.matcher(url.trim()).matches()) {
             throw new IllegalArgumentException("unsupported git url: " + url);
         }
         String clean = url.trim();
-        Project p = projects.save(newProject(name, repoName(clean), SourceType.GIT, clean, PENDING, branch));
+        if (clean.startsWith("file:")) requireLocalPaths();
+        Project p = projects.save(newProject(ownerId, name, repoName(clean), SourceType.GIT, clean, PENDING, branch));
         p.setLocalPath(workspace.checkoutDir(p.getId()).toString());
         return projects.save(p);
     }
 
-    public Project createUpload(String name, String filename, InputStream zip) {
-        Project p = projects.save(newProject(name, stripExtension(filename), SourceType.UPLOAD, filename, PENDING, null));
+    public Project createUpload(Long ownerId, String name, String filename, InputStream zip) {
+        Project p = projects.save(newProject(ownerId, name, stripExtension(filename), SourceType.UPLOAD, filename,
+                PENDING, null));
         try {
             Path dir = workspace.checkoutDir(p.getId());
             zips.extract(zip, dir);
@@ -92,9 +98,14 @@ public class ProjectService {
         events.publishEvent(new ProjectDeletedEvent(id));
     }
 
-    private static Project newProject(String name, String fallback, SourceType type, String uri, String path,
-                                      String branch) {
+    private void requireLocalPaths() {
+        if (!allowLocalPaths) throw new IllegalArgumentException("local paths are disabled on this server");
+    }
+
+    private static Project newProject(Long ownerId, String name, String fallback, SourceType type, String uri,
+                                      String path, String branch) {
         var p = new Project();
+        p.setOwnerId(ownerId);
         String n = name == null || name.isBlank() ? fallback : name.trim();
         p.setName(n.length() > 200 ? n.substring(0, 200) : n);
         p.setSourceType(type);

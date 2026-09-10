@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,12 +22,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
 class ApiIntegrationTest extends IntegrationTest {
 
     private static Long projectId;
+    private static String token;
 
-    @Autowired
     MockMvc mvc;
     @Autowired
     ObjectMapper json;
@@ -39,6 +37,8 @@ class ApiIntegrationTest extends IntegrationTest {
 
     @BeforeEach
     void analyzedProject() throws Exception {
+        if (token == null) token = signUp("api").token();
+        mvc = mvcAs(token);
         if (projectId != null) return;
         var body = Map.of("name", "api-sample", "sourceType", "LOCAL", "path", SampleProject.root().toString(),
                 "analyze", false);
@@ -136,6 +136,25 @@ class ApiIntegrationTest extends IntegrationTest {
                 .andExpect(jsonPath("$.items[0].entity.kind", anyOf(is("METHOD"), is("CONSTRUCTOR"))));
         mvc.perform(get("/api/projects/{id}/metrics/modules", projectId).param("level", "PACKAGE"))
                 .andExpect(jsonPath("$.items[*].name", hasItem("com.acme.domain")));
+    }
+
+    @Test
+    void dashboardAggregatesOwnedProjects() throws Exception {
+        mvc.perform(get("/api/dashboard"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.projects[?(@.name == 'api-sample')].types", contains(7)))
+                .andExpect(jsonPath("$.projects[?(@.name == 'api-sample')].endpoints", contains(2)))
+                .andExpect(jsonPath("$.totals.files", greaterThanOrEqualTo(7)))
+                .andExpect(jsonPath("$.activity.length()").value(14))
+                .andExpect(jsonPath("$.hotspots[0].projectName").exists());
+    }
+
+    @Test
+    void overviewHasKpis() throws Exception {
+        mvc.perform(get("/api/projects/{id}/overview", projectId))
+                .andExpect(jsonPath("$.kpis.maxRisk", greaterThan(0.0)))
+                .andExpect(jsonPath("$.kpis.complexity.length()").value(5))
+                .andExpect(jsonPath("$.kpis.avgComplexity", greaterThanOrEqualTo(1.0)));
     }
 
     @Test

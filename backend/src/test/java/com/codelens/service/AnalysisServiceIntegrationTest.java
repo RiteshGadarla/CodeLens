@@ -42,7 +42,7 @@ class AnalysisServiceIntegrationTest extends IntegrationTest {
 
     @Test
     void fullAnalysisPersistsFactsGraphAndMetrics() {
-        var project = projects.createLocal("sample", SampleProject.root().toString());
+        var project = projects.createLocal(NO_OWNER, "sample", SampleProject.root().toString());
         var run = analysis.runNow(project.getId(), RunMode.FULL);
 
         assertThat(run.getStatus()).isEqualTo(RunStatus.SUCCESS);
@@ -63,7 +63,7 @@ class AnalysisServiceIntegrationTest extends IntegrationTest {
 
     @Test
     void reanalysisReplacesData() {
-        var project = projects.createLocal("again", SampleProject.root().toString());
+        var project = projects.createLocal(NO_OWNER, "again", SampleProject.root().toString());
         analysis.runNow(project.getId(), RunMode.FULL);
         analysis.runNow(project.getId(), RunMode.FULL);
 
@@ -74,7 +74,7 @@ class AnalysisServiceIntegrationTest extends IntegrationTest {
 
     @Test
     void analyzesUploadedZip() throws IOException {
-        var project = projects.createUpload("", "sample.zip", new ByteArrayInputStream(zip(SampleProject.root(), "sample-main/")));
+        var project = projects.createUpload(NO_OWNER, "", "sample.zip", new ByteArrayInputStream(zip(SampleProject.root(), "sample-main/")));
         assertThat(project.getName()).isEqualTo("sample");
         assertThat(project.getLocalPath()).endsWith("sample-main");
 
@@ -92,7 +92,7 @@ class AnalysisServiceIntegrationTest extends IntegrationTest {
             git.commit().setMessage("init").setAuthor("t", "t@t").setCommitter("t", "t@t").setSign(false).call();
         }
 
-        var project = projects.createGit(null, origin.toUri().toString(), "main");
+        var project = projects.createGit(NO_OWNER, null, origin.toUri().toString(), "main");
         assertThat(project.getName()).isEqualTo("origin");
 
         var run = analysis.runNow(project.getId(), RunMode.FULL);
@@ -107,7 +107,7 @@ class AnalysisServiceIntegrationTest extends IntegrationTest {
     @Test
     void failureMarksRunAndProject(@TempDir Path tmp) throws IOException {
         Path dir = Files.createDirectories(tmp.resolve("gone"));
-        var project = projects.createLocal("gone", dir.toString());
+        var project = projects.createLocal(NO_OWNER, "gone", dir.toString());
         Files.delete(dir);
 
         var run = analysis.runNow(project.getId(), RunMode.FULL);
@@ -118,16 +118,16 @@ class AnalysisServiceIntegrationTest extends IntegrationTest {
 
     @Test
     void validatesSources() {
-        assertThatThrownBy(() -> projects.createLocal("x", "/definitely/not/here"))
+        assertThatThrownBy(() -> projects.createLocal(NO_OWNER, "x", "/definitely/not/here"))
                 .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> projects.createGit("x", "ftp://example.com/repo", null))
+        assertThatThrownBy(() -> projects.createGit(NO_OWNER, "x", "ftp://example.com/repo", null))
                 .isInstanceOf(IllegalArgumentException.class);
         assertThat(ProjectService.repoName("git@github.com:acme/shop.git")).isEqualTo("shop");
     }
 
     @Test
     void deleteCascadesProjectData() {
-        var project = projects.createLocal("delete-me", SampleProject.root().toString());
+        var project = projects.createLocal(NO_OWNER, "delete-me", SampleProject.root().toString());
         analysis.runNow(project.getId(), RunMode.FULL);
         projects.delete(project.getId());
         assertThat(count("code_entity", project.getId())).isZero();
