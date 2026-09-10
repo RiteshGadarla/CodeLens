@@ -44,4 +44,17 @@ class CycleDetectorTest {
                 List.of(edge(1, 2, USES_TYPE)));
         assertThat(CycleDetector.cycles(dag)).isEmpty();
     }
+
+    @Test
+    void nestedTypesDoNotFormCyclesWithTheirOuterType() {
+        var g = DependencyGraph.of(List.of(
+                node(1, "a.Scope", com.codelens.domain.EntityKind.INTERFACE, null),
+                node(2, "a.Scope.None", CLASS, 1L),
+                node(3, "a.Scope#NONE", com.codelens.domain.EntityKind.FIELD, 1L)
+        ), List.of(edge(2, 1, com.codelens.domain.EdgeType.IMPLEMENTS), edge(3, 2, USES_TYPE)));
+
+        var types = GraphRollup.types(g);
+        assertThat(types.edgeCount()).isZero();
+        assertThat(CycleDetector.cycles(types)).isEmpty();
+    }
 }

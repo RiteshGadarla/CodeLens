@@ -28,7 +28,8 @@ public final class GraphRollup {
             if (os < 0) continue;
             for (Adj a : g.out(s)) {
                 int ot = owner[a.node()];
-                if (ot < 0 || ot == os) continue;
+                // a type and its own nested types are one unit, not coupling
+                if (ot < 0 || ot == os || nested(g, os, ot) || nested(g, ot, os)) continue;
                 merged.merge(new Key(g.node(os).id(), g.node(ot).id(), a.type()), a.weight(), Integer::sum);
             }
         }
@@ -36,5 +37,12 @@ public final class GraphRollup {
                 .map(e -> new GraphEdge(e.getKey().source(), e.getKey().target(), e.getKey().type(), e.getValue()))
                 .toList();
         return DependencyGraph.of(nodes, edges);
+    }
+
+    private static boolean nested(DependencyGraph g, int inner, int outer) {
+        for (int p = g.parent(inner); p >= 0; p = g.parent(p)) {
+            if (p == outer) return true;
+        }
+        return false;
     }
 }

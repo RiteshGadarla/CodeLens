@@ -93,6 +93,8 @@ class GraphTraversalTest {
         assertThat(g.ownerType(idx(9))).isEqualTo(idx(3));
         assertThat(g.node(idx(8)).label()).isEqualTo("Impl#x()");
         assertThat(g.node(idx(9)).label()).isEqualTo("GET /x");
+        assertThat(GraphNode.labelOf("com.acme.Scope.None", CLASS, "None")).isEqualTo("Scope.None");
+        assertThat(GraphNode.labelOf("com.acme.Svc#<init>(Repo,int)", CONSTRUCTOR, "Svc")).isEqualTo("Svc(Repo,int)");
         assertThat(g.members(idx(3))).containsExactlyInAnyOrder(idx(4), idx(9));
     }
 
