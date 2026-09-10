@@ -7,6 +7,7 @@ import com.codelens.domain.SourceType;
 import com.codelens.ingest.Workspace;
 import com.codelens.ingest.ZipExtractor;
 import com.codelens.repository.ProjectRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -28,14 +29,16 @@ public class ProjectService {
     private final ZipExtractor zips;
     private final AnalysisService analysis;
     private final GraphService graphs;
+    private final ApplicationEventPublisher events;
 
     public ProjectService(ProjectRepository projects, Workspace workspace, ZipExtractor zips,
-                          AnalysisService analysis, GraphService graphs) {
+                          AnalysisService analysis, GraphService graphs, ApplicationEventPublisher events) {
         this.projects = projects;
         this.workspace = workspace;
         this.zips = zips;
         this.analysis = analysis;
         this.graphs = graphs;
+        this.events = events;
     }
 
     public List<Project> list() {
@@ -86,6 +89,7 @@ public class ProjectService {
         graphs.evict(id);
         // local sources live outside the workspace; only cache is removed
         workspace.deleteQuietly(id);
+        events.publishEvent(new ProjectDeletedEvent(id));
     }
 
     private static Project newProject(String name, String fallback, SourceType type, String uri, String path,

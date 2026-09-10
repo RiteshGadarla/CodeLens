@@ -1,5 +1,6 @@
 package com.codelens.api;
 
+import com.codelens.common.AiUnavailableException;
 import com.codelens.common.ConflictException;
 import com.codelens.common.NotFoundException;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConflictException.class)
     ProblemDetail conflict(ConflictException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    @ExceptionHandler(AiUnavailableException.class)
+    ProblemDetail aiUnavailable(AiUnavailableException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, e.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

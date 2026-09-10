@@ -20,8 +20,12 @@ public record GraphNode(
         boolean abstractType
 ) {
 
-    // UserService, UserService#find(Long), GET /users
     public String label() {
+        return labelOf(qualifiedName, kind, name);
+    }
+
+    // UserService, UserService#find(Long), GET /users
+    public static String labelOf(String qualifiedName, EntityKind kind, String name) {
         if (kind == EntityKind.ENDPOINT) return name;
         int hash = qualifiedName.indexOf('#');
         String type = hash < 0 ? qualifiedName : qualifiedName.substring(0, hash);
