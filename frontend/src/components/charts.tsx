@@ -150,12 +150,21 @@ export function MainSequenceChart({ modules }: { modules: ModuleMetrics[] }) {
     const k = `${m.instability.toFixed(2)}:${m.abstractness.toFixed(2)}`
     points.set(k, [...(points.get(k) ?? []), m])
   })
-  const labelled = new Set(
-    [...points.entries()]
-      .sort((a, b) => Math.max(...b[1].map((m) => m.distance)) - Math.max(...a[1].map((m) => m.distance)))
-      .slice(0, 3)
-      .map(([k]) => k),
+  // label the farthest-from-sequence points, skipping any that would overlap an earlier label
+  const labelled = new Set<string>()
+  const placed: { x: number; y: number }[] = []
+  const ranked = [...points.entries()].sort(
+    (a, b) => Math.max(...b[1].map((m) => m.distance)) - Math.max(...a[1].map((m) => m.distance)),
   )
+  for (const [k, group] of ranked) {
+    if (labelled.size >= 4) break
+    const x = sx(group[0].instability)
+    const y = sy(group[0].abstractness)
+    if (placed.every((p) => Math.abs(p.x - x) > 90 || Math.abs(p.y - y) > 20)) {
+      labelled.add(k)
+      placed.push({ x, y })
+    }
+  }
   const ticks = [0, 0.25, 0.5, 0.75, 1]
   const hovered = hover ? points.get(hover) : undefined
 
@@ -180,8 +189,6 @@ export function MainSequenceChart({ modules }: { modules: ModuleMetrics[] }) {
         <text x={sx(0.52)} y={sy(0.52) - 6} fontSize={10} fill={INK.muted} transform={`rotate(-34 ${sx(0.52)} ${sy(0.52) - 6})`}>
           main sequence
         </text>
-        <text x={sx(0.02)} y={sy(0.04)} fontSize={10} fill={INK.muted}>zone of pain</text>
-        <text x={sx(0.98)} y={sy(0.95)} fontSize={10} fill={INK.muted} textAnchor="end">zone of uselessness</text>
         <text x={pad.l + pw / 2} y={H - 6} textAnchor="middle" fontSize={11} fill={INK.secondary}>
           Instability  Ce / (Ca + Ce)
         </text>
@@ -214,6 +221,9 @@ export function MainSequenceChart({ modules }: { modules: ModuleMetrics[] }) {
           )
         })}
       </svg>
+      <p className="mt-1 text-center text-[11px] text-slate-500">
+        bottom-left: zone of pain (concrete, heavily used) · top-right: zone of uselessness (abstract, unused)
+      </p>
       {hovered && (
         <Tooltip x={`${(sx(hovered[0].instability) / W) * 100}%`} y={`${(sy(hovered[0].abstractness) / H) * 100}%`}>
           {hovered.slice(0, 5).map((m) => (

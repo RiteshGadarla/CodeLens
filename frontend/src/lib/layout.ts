@@ -7,7 +7,7 @@ export const NODE_HEIGHT = 58
 // layered layout; dependencies flow left to right
 export function layoutGraph<N extends Node>(nodes: N[], edges: Edge[], direction: 'LR' | 'TB' = 'LR'): N[] {
   const g = new dagre.graphlib.Graph()
-  g.setGraph({ rankdir: direction, nodesep: 28, ranksep: 90, marginx: 20, marginy: 20 })
+  g.setGraph({ rankdir: direction, nodesep: 18, ranksep: 64, marginx: 10, marginy: 10 })
   g.setDefaultEdgeLabel(() => ({}))
   nodes.forEach((n) => g.setNode(n.id, { width: NODE_WIDTH, height: NODE_HEIGHT }))
   edges.forEach((e) => g.setEdge(e.source, e.target))

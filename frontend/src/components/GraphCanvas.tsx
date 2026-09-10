@@ -98,7 +98,7 @@ export function GraphCanvas({
       defaultEdges={edges}
       nodeTypes={nodeTypes}
       fitView
-      fitViewOptions={{ padding: 0.15 }}
+      fitViewOptions={{ padding: 0.06, maxZoom: 1.1 }}
       minZoom={0.1}
       maxZoom={2}
       onNodeClick={(_, n) => onSelect((n as EntityFlowNode).data.node)}
