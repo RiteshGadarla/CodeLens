@@ -1,8 +1,9 @@
-import { ArrowRight, Crosshair, Eye, EyeOff, Gauge, Sparkles } from 'lucide-react'
+import { ArrowRight, Crosshair, Eye, EyeOff, Gauge } from 'lucide-react'
 import { useState, type FormEvent, type InputHTMLAttributes, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ApiError } from '@/api/client'
 import { Logo } from '@/components/Logo'
+import { LyraIcon } from '@/components/Lyra'
 import { Button, ErrorState } from '@/components/ui'
 import { useAuth } from '@/lib/auth'
 
@@ -12,7 +13,7 @@ const inputClass =
 const highlights = [
   { icon: Crosshair, title: 'See the blast radius', body: 'Every dependent, endpoint and test a change reaches.' },
   { icon: Gauge, title: 'Explainable risk', body: 'Scores built from five open, measurable factors.' },
-  { icon: Sparkles, title: 'Ask Lyra', body: 'Answers grounded in your dependency graph, with citations.' },
+  { icon: LyraIcon, title: 'Ask Lyra', body: 'Answers grounded in your dependency graph, with citations.' },
 ]
 
 function BrandPanel() {

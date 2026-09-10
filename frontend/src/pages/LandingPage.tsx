@@ -1,11 +1,11 @@
 import {
   ArrowRight, Check, Crosshair, FlaskConical, Gauge, GitBranch, Layers, Menu, Network, OctagonAlert, RefreshCw,
-  ShieldCheck, Sparkles, TriangleAlert, X,
+  ShieldCheck, TriangleAlert, X,
 } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Logo } from '@/components/Logo'
-import { LyraMark } from '@/components/Lyra'
+import { LyraIcon, LyraMark } from '@/components/Lyra'
 import { useAuth } from '@/lib/auth'
 import { factorLabel, factorWeight, riskStyle } from '@/lib/risk'
 
@@ -56,7 +56,7 @@ const features = [
     body: 'Afferent and efferent coupling, instability, abstractness and distance from the main sequence for every package and module.',
   },
   {
-    icon: Sparkles,
+    icon: LyraIcon,
     title: 'Lyra assistant',
     body: 'Ask about the codebase in plain English. Lyra answers from graph facts and retrieved source, and cites every excerpt it uses.',
   },
@@ -75,7 +75,7 @@ const lyraPoints = [
   { title: 'Light on quota', body: 'Embeddings run locally; answers are rate-limited and cached, so free tiers go a long way.' },
 ]
 
-const stack = ['Java 21', 'Spring Boot 3', 'JavaParser', 'PostgreSQL', 'Redis', 'FastAPI', 'Gemma', 'React 19', 'React Flow', 'Docker']
+const stack = ['Java 21', 'Spring Boot 3', 'JavaParser', 'PostgreSQL', 'Redis', 'FastAPI', 'React 19', 'React Flow', 'Docker']
 
 function Nav() {
   const { signedIn } = useAuth()
@@ -138,7 +138,7 @@ function Hero() {
       />
       <div className="relative mx-auto max-w-6xl px-6 pt-20 pb-24 text-center sm:pt-28">
         <a href="#lyra" className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs text-slate-300 transition hover:bg-white/10">
-          <Sparkles className="size-3.5 text-violet-300" /> Meet Lyra, the assistant that reads your dependency graph
+          <LyraMark size={20} className="ring-white/20" /> Meet Lyra, the assistant that reads your dependency graph
           <ArrowRight className="size-3.5" />
         </a>
         <h1 className="mx-auto mt-7 max-w-4xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
@@ -388,7 +388,7 @@ function LyraSection() {
       <div className="mx-auto grid max-w-6xl items-center gap-14 px-6 py-24 lg:grid-cols-2">
         <div>
           <div className="flex items-center gap-3">
-            <LyraMark size={40} className="rounded-xl" />
+            <LyraMark size={44} />
             <Eyebrow>Meet Lyra</Eyebrow>
           </div>
           <h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">An assistant that has actually read your code</h2>

@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { ChartColumn, ChevronLeft, LayoutDashboard, LoaderCircle, Network, RefreshCw, Sparkles } from 'lucide-react'
+import { ChartColumn, ChevronLeft, LayoutDashboard, LoaderCircle, Network, RefreshCw } from 'lucide-react'
 import { Suspense, useEffect, useRef } from 'react'
 import { Link, NavLink, Outlet, useNavigate, useOutletContext } from 'react-router-dom'
 import { invalidateProject, useAnalyze, useProject } from '@/api/queries'
@@ -9,6 +9,7 @@ import { useProjectId } from '@/lib/hooks'
 import type { Project } from '@/types/api'
 import { UserMenu } from './AppHeader'
 import { EntityPicker } from './EntityPicker'
+import { LyraIcon } from './Lyra'
 import { Logo } from './Logo'
 import { StatusBadge } from './StatusBadge'
 import { Button, ErrorState, Spinner } from './ui'
@@ -19,7 +20,7 @@ const nav = [
   { to: '', label: 'Overview', icon: LayoutDashboard, end: true },
   { to: 'graph', label: 'Dependency graph', icon: Network },
   { to: 'metrics', label: 'Metrics', icon: ChartColumn },
-  { to: 'lyra', label: 'Lyra', icon: Sparkles },
+  { to: 'lyra', label: 'Lyra', icon: LyraIcon },
 ]
 
 export function ProjectLayout() {

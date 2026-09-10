@@ -176,10 +176,10 @@ export function Delta({ value, format = (v: number) => v.toLocaleString() }: { v
 }
 
 // marks content produced by static analysis vs Lyra
-export function Provenance({ kind, model }: { kind: 'static' | 'ai'; model?: string | null }) {
+export function Provenance({ kind }: { kind: 'static' | 'ai' }) {
   return kind === 'static' ? (
     <Badge className="bg-slate-100 text-slate-700 ring-slate-300">Static analysis</Badge>
   ) : (
-    <Badge className="bg-violet-50 text-violet-700 ring-violet-200">Lyra{model ? ` · ${model}` : ''}</Badge>
+    <Badge className="bg-violet-50 text-violet-700 ring-violet-200">Lyra</Badge>
   )
 }

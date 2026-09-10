@@ -26,7 +26,7 @@ function Answer({ turn, projectId }: { turn: Turn; projectId: number }) {
       <LyraMark size={30} />
       <Card className="min-w-0 flex-1 p-5">
         <div className="mb-3 flex items-center gap-2">
-          <Provenance kind="ai" model={r.model} />
+          <Provenance kind="ai" />
           {r.cached && <span className="text-[11px] text-slate-400">cached</span>}
         </div>
         <Markdown text={r.answer} onCite={cite} />
@@ -109,7 +109,7 @@ export default function LyraPage() {
       <div className="flex-1 space-y-5 overflow-auto py-6">
         {turns.length === 0 && (
           <div className="py-10 text-center">
-            <LyraMark size={52} className="mx-auto rounded-2xl" />
+            <LyraMark size={56} className="mx-auto" />
             <h2 className="mt-4 text-xl font-semibold tracking-tight text-slate-900">Ask Lyra about {project.name}</h2>
             <p className="mx-auto mt-2 max-w-lg text-sm text-slate-500">
               Lyra answers from the dependency graph and retrieved source. Graph facts come from static analysis; Lyra writes the

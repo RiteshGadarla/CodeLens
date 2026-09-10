@@ -49,7 +49,7 @@ function ReportCard({ projectId, entityId }: { projectId: number; entityId: numb
         {report && !generate.isPending && (
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Provenance kind="ai" model={report.model} />
+              <Provenance kind="ai" />
               <span className="text-xs text-slate-400">{fmtAgo(report.createdAt)}</span>
             </div>
             <Markdown text={report.summary} />

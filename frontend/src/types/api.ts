@@ -340,7 +340,6 @@ export interface AskResponse {
   answer: string
   sources: AiSource[]
   facts: Record<string, unknown>
-  model: string
   cached: boolean
   generatedBy: string
 }
@@ -352,6 +351,5 @@ export interface Report {
   impact: Impact
   summary: string
   sources: AiSource[]
-  model: string | null
   createdAt: string
 }
