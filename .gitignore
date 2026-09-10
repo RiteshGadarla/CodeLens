@@ -1,0 +1,31 @@
+PLAN.md
+
+# env
+.env
+*.env
+!.env.example
+
+# java
+backend/target/
+*.class
+
+# python
+__pycache__/
+*.py[cod]
+ai-service/.venv/
+ai-service/data/
+
+# node
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# workspace
+data/
+repos/
+*.log
+
+# ide
+.idea/
+.vscode/
+*.iml
